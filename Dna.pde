@@ -38,7 +38,7 @@ class Dna {
         img.noStroke();
         for (int i = 0; i<genes.length; i++) {
 
-            float diameter = map(genes[i][0], 0, 1, 1, 25);
+            float diameter = map(genes[i][0], 0, 1, 1, 17);
             float x = map(genes[i][1], 0, 1, 0, img.width);
             float y = map(genes[i][2], 0, 1, 0, img.height);
             //float r = map(genes[i][3], 0, 1, 0, 255);
@@ -57,28 +57,30 @@ class Dna {
         target.loadPixels();
 
         float score = 0;
-        for (int x = 0; x<img.width; x++) {
-            for (int y = 0; y<img.height; y++) {
+        for (int x = 0; x<img.width; x+=3) {
+            for (int y = 0; y<img.height; y+=3) {
                 int index = x+y*img.width;
-                score += distSq(
-                    red   (img.pixels[index]), 
-                    green (img.pixels[index]), 
-                    blue  (img.pixels[index]), 
-                    red   (target.pixels[index]), 
-                    green (target.pixels[index]), 
-                    blue  (target.pixels[index])
-                    );
+                score += distSq(img.pixels[index], target.pixels[index]);
+                //score += distSq(
+                //    red   (img.pixels[index]), 
+                //    green (img.pixels[index]), 
+                //    blue  (img.pixels[index]), 
+                //    red   (target.pixels[index]), 
+                //    green (target.pixels[index]), 
+                //    blue  (target.pixels[index])
+                //    );
             }
         }
         fitness = (1/score)*1e10;
-        //fitness =fitness;
-        //println("Score: "+score+"; Fitness: "+fitness);
+        //fitness = pow(fitness, 1);
+        //println("Fitness: "+fitness);
     }
 
     Dna crossover(Dna partner) {
+        float[][] newGenes = new float[genes.length][genes[0].length];
+
         int point1 = (int)random(genes.length-2);       
         int point2 = (int)random(point1, genes.length);
-        float[][] newGenes = new float[genes.length][genes[0].length];
 
         for (int i = 0; i<genes.length; i++) {
             if (i<point1) {
@@ -89,6 +91,14 @@ class Dna {
                 newGenes[i] = genes[i];
             }
         }
+
+        //float weight= 0.5;
+        //for (int i = 0; i<genes.length; i++) {
+        //    for (int j = 0; j<genes[0].length; j++) {
+        //        newGenes[i][j] = (weight*genes[i][j])+((1-weight)*partner.genes[i][j]);
+        //    }
+        //}
+
         return new Dna(newGenes, img.width, img.height);
     }
 
@@ -102,7 +112,5 @@ class Dna {
         }
     }
 
-    float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
-        return (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1);
-    }
+
 }
